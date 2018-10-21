@@ -5,7 +5,6 @@
   Outputs: Displays power-on-reset values of all nRF24L01+ registers from 00H to 1DH on serial terminal. */
 
 #include <SPI.h>
-#define IRQ_pin 2
 #define CE_pin 9
 #define CSN_pin 10
 #define MOSI_pin 11
@@ -32,17 +31,32 @@ void loop()
   {
     if (k < 0x18 || k >= 0x1C)
     {
-      digitalWrite(CSN_pin, LOW);
-      SPI.transfer(k);
       Serial.print(k, HEX);
       Serial.print("H: ");
-      regVal = SPI.transfer(0x00);
-      Serial.println(regVal, HEX);
-      digitalWrite(CSN_pin, HIGH);
-      delay(1);
+      if (k == 0x0A || k == 0x0B || k == 0x10)
+      {
+        for(uint8_t j = 0; j <= 4; j++)
+          readRegisterMap(k, false); 
+        Serial.println();
+      }
+      else
+        readRegisterMap(k, true);
     }
     else
       k += 0x03;
   }
   while(1);
+}
+
+void readRegisterMap(uint8_t m, boolean n)
+{
+  digitalWrite(CSN_pin, LOW);
+  SPI.transfer(m);
+  regVal = SPI.transfer(0x00);
+  if (n)
+    Serial.println(regVal, HEX);
+  else
+    Serial.print(regVal, HEX);
+  digitalWrite(CSN_pin, HIGH);
+  delay(1);
 }
