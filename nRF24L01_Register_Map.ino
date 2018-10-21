@@ -27,6 +27,7 @@ void setup()
 
 void loop() 
 {
+  Serial.print("Reading register map table reset values according to datasheet: \r\n\n");
   for (uint8_t k = 0; k <= 0x1D; k++)
   {
     if (k < 0x18 || k >= 0x1C)
